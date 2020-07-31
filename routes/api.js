@@ -15,7 +15,7 @@ router.get("/ping", (req, res) => {
  * Create application route
  */
 
-router.post("/application/create", (req, res) => {
+router.post("/application", (req, res) => {
 	// Store for validation errors
 	let validationErrors = [];
 
@@ -78,6 +78,19 @@ router.get("/application/all", (req, res) => {
 		.catch((err) => {
 			res.status(500).json({ success: false, error: applications.error });
 		});
+});
+
+/**
+ * Delete an application
+ */
+
+router.delete("/application", (req, res) => {
+	// Validating ID has been provided
+	if (req.query.id === null || req.query.id === undefined) {
+		res.status(400).json({ Error: "id param required" });
+	}
+
+	// TODO
 });
 
 module.exports = router;

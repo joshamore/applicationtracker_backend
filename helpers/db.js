@@ -72,4 +72,8 @@ module.exports = {
 			return { error: err };
 		}
 	},
+	/**
+	 * Delete an application for a user
+	 */
+	// TODO
 };

@@ -1,7 +1,12 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 
 // Create express server
 const app = express();
+
+// Body parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Setting routes
 app.use("/api", require("./routes/api"));

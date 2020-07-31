@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../helpers/db");
+const CONSTANTS = require("../CONSTANTS");
 
 /**
  * Ping route to check connecton with backend
@@ -14,7 +15,7 @@ router.get("/ping", (req, res) => {
  * Create application route
  */
 
-router.post("/create/application", (req, res) => {
+router.post("/application/create", (req, res) => {
 	// Store for validation errors
 	let validationErrors = [];
 
@@ -57,6 +58,25 @@ router.post("/create/application", (req, res) => {
 		})
 		.catch((err) => {
 			res.status(500).json({ success: false, error: confirm.error });
+		});
+});
+
+/**
+ * Get applications for user route
+ */
+
+router.get("/application/all", (req, res) => {
+	// TODO: currently using UUID from constants but will come from logged in user
+	db.getApplications(CONSTANTS.testing.auth_user_uuid)
+		.then((applications) => {
+			if (applications.error === null) {
+				res.json(applications);
+			} else {
+				res.status(500).json({ success: false, error: applications.error });
+			}
+		})
+		.catch((err) => {
+			res.status(500).json({ success: false, error: applications.error });
 		});
 });
 

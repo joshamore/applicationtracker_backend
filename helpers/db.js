@@ -18,7 +18,7 @@ module.exports = {
 	createApplication: async function (apptitle, appemployer, applink) {
 		// Setting DB query
 		// TODO: Need to use a real auth user in prod
-		let query = {
+		const query = {
 			text: `
                 INSERT INTO applications (app_user, app_title, app_employer, app_link)
                 VALUES ($1, $2, $3, $4)
@@ -44,6 +44,30 @@ module.exports = {
 			return confirmResponse;
 		} catch (err) {
 			console.error(`createApplication error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
+	/**
+	 * Get applications for a user
+	 */
+	getApplications: async function (user) {
+		// Setting query
+		const query = {
+			text: "SELECT * FROM applications WHERE app_user = $1",
+			values: [user],
+		};
+
+		try {
+			// Attempting to get application records for user
+			const records = await pool.query(query);
+
+			let applications = records.rows;
+			applications.error = null;
+
+			return applications;
+		} catch (err) {
+			console.error(`getApplications error: ${err}`);
 			// returning error
 			return { error: err };
 		}

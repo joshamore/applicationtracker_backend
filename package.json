@@ -1,0 +1,22 @@
+{
+  "name": "applicationtracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshamore/applicationtracker_backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joshamore/applicationtracker_backend/issues"
+  },
+  "homepage": "https://github.com/joshamore/applicationtracker_backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

@@ -75,5 +75,30 @@ module.exports = {
 	/**
 	 * Delete an application for a user
 	 */
-	// TODO
+	deleteApplication: async function (application) {
+		// Setting query
+		const query = {
+			text:
+				"UPDATE applications SET app_recordstate = $1 WHERE app_id = $2 RETURNING app_id",
+			values: [CONSTANTS.recordstates.deleted, application],
+		};
+
+		try {
+			// Attempting DB update
+			const confirm = await pool.query(query);
+
+			if (
+				confirm.rows[0].app_id !== null ||
+				confirm.rows[0].app_id !== undefined
+			) {
+				return application;
+			} else {
+				throw Error("Unknown confirmation");
+			}
+		} catch (err) {
+			console.error(`deleteApplication error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
 };

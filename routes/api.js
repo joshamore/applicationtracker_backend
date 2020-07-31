@@ -57,7 +57,7 @@ router.post("/application", (req, res) => {
 			}
 		})
 		.catch((err) => {
-			res.status(500).json({ success: false, error: confirm.error });
+			res.status(500).json({ success: false, error: err });
 		});
 });
 
@@ -76,7 +76,7 @@ router.get("/application/all", (req, res) => {
 			}
 		})
 		.catch((err) => {
-			res.status(500).json({ success: false, error: applications.error });
+			res.status(500).json({ success: false, error: err });
 		});
 });
 
@@ -90,7 +90,17 @@ router.delete("/application", (req, res) => {
 		res.status(400).json({ Error: "id param required" });
 	}
 
-	// TODO
+	db.deleteApplication(req.query.id)
+		.then((confirm) => {
+			if (confirm === req.query.id) {
+				res.json({ success: true, error: null });
+			} else {
+				res.status(500).json({ success: false, error: confirm.error });
+			}
+		})
+		.catch((err) => {
+			res.status(500).json({ success: false, error: err });
+		});
 });
 
 module.exports = router;

@@ -64,6 +64,7 @@ router.post("/application", (req, res) => {
 /**
  * Update an existing application
  */
+
 router.put("/application", (req, res) => {
 	let validationErrors = [];
 
@@ -109,7 +110,9 @@ router.put("/application", (req, res) => {
 		.then((confirm) => {
 			res.json(confirm);
 		})
-		.catch((err) => res.json(err));
+		.catch((err) => {
+			res.status(500).json({ success: false, error: err });
+		});
 });
 
 /**

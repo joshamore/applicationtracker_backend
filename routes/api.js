@@ -101,6 +101,7 @@ router.put("/application", (req, res) => {
 		res.status(400).json({ error: validationErrors });
 	}
 
+	// Performing update
 	db.updateApplication(
 		id,
 		applicationtitle,
@@ -108,9 +109,12 @@ router.put("/application", (req, res) => {
 		applicationlink
 	)
 		.then((confirm) => {
+			confirm.success = true;
+			// If update successful, returning the updated DB row as an object
 			res.json(confirm);
 		})
 		.catch((err) => {
+			// If update failed, responding with error
 			res.status(500).json({ success: false, error: err });
 		});
 });
@@ -120,10 +124,14 @@ router.put("/application", (req, res) => {
  */
 
 router.get("/application/all", (req, res) => {
+	console.log("GETTING APPLICATIONS");
+
 	// TODO: currently using UUID from constants but will come from logged in user
 	db.getApplications(CONSTANTS.testing.auth_user_uuid)
 		.then((applications) => {
 			if (applications.error === null) {
+				console.log("GOT APPLICATIONS");
+
 				res.json(applications);
 			} else {
 				res.status(500).json({ success: false, error: applications.error });

@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 // Create express server
 const app = express();
@@ -7,6 +8,9 @@ const app = express();
 // Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// CORS middleware
+app.use(cors());
 
 // Setting routes
 app.use("/api", require("./routes/api"));

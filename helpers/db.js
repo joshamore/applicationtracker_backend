@@ -49,6 +49,47 @@ module.exports = {
 		}
 	},
 	/**
+	 * Update an existing application record
+	 */
+	updateApplication: async function (appID, appTitle, appEmployer, appLink) {
+		try {
+			// Getting application original state
+			const appOriginal = await this.getSingleApplication(appID);
+
+			// Updating params to original values if null
+			appTitle = appTitle === null ? appOriginal.app_title : appTitle;
+			appEmployer =
+				appEmployer === null ? appOriginal.app_employer : appEmployer;
+			appLink = appLink === null ? appOriginal.app_link : appLink;
+
+			// Building query
+			const query = {
+				text: `
+					UPDATE
+						applications
+					SET
+						app_title = $1,
+						app_employer = $2,
+						app_link = $3
+					WHERE
+						app_id = $4
+					RETURNING
+						*
+					`,
+				values: [appTitle, appEmployer, appLink, appID],
+			};
+
+			const record = await pool.query(query);
+
+			// Returning updated record
+			return record.rows[0];
+		} catch (err) {
+			console.error(err);
+			return { error: err };
+		}
+	},
+
+	/**
 	 * Get applications for a user
 	 */
 	getApplications: async function (user) {
@@ -72,6 +113,32 @@ module.exports = {
 			return { error: err };
 		}
 	},
+
+	/**
+	 * Get a single application based on application ID
+	 */
+	getSingleApplication: async function (appID) {
+		// Setting query
+		const query = {
+			text: "SELECT * FROM applications WHERE app_id = $1",
+			values: [appID],
+		};
+
+		try {
+			// Attempting to get application record
+			const record = await pool.query(query);
+
+			let application = record.rows[0];
+			application.error = null;
+
+			return application;
+		} catch (err) {
+			console.error(`getApplications error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
+
 	/**
 	 * Delete an application for a user
 	 */

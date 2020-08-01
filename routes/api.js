@@ -62,6 +62,57 @@ router.post("/application", (req, res) => {
 });
 
 /**
+ * Update an existing application
+ */
+router.put("/application", (req, res) => {
+	let validationErrors = [];
+
+	// Extracint required values from body object
+	const id = req.body.id;
+	const applicationtitle = req.body.applicationtitle;
+	const applicationemployer = req.body.applicationemployer;
+	const applicationlink = req.body.applicationlink;
+
+	// Validating required fields
+	if (id === null || id === undefined) {
+		validationErrors.push(
+			"Request body must contain id field. This cannot be null"
+		);
+	}
+	if (applicationtitle === undefined) {
+		validationErrors.push(
+			"Request body must contain applicationtitle field. This may be null"
+		);
+	}
+	if (applicationemployer === undefined) {
+		validationErrors.push(
+			"Request body must contain applicationemployer field. This may be null"
+		);
+	}
+	if (applicationlink === undefined) {
+		validationErrors.push(
+			"Request body must contain applicationlink field. This may be null"
+		);
+	}
+
+	// Responding with errors (if any)
+	if (validationErrors.length !== 0) {
+		res.status(400).json({ error: validationErrors });
+	}
+
+	db.updateApplication(
+		id,
+		applicationtitle,
+		applicationemployer,
+		applicationlink
+	)
+		.then((confirm) => {
+			res.json(confirm);
+		})
+		.catch((err) => res.json(err));
+});
+
+/**
  * Get applications for user route
  */
 

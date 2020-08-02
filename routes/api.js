@@ -120,6 +120,36 @@ router.put("/application", (req, res) => {
 });
 
 /**
+ * Get a single application for user route
+ */
+
+router.get("/application", (req, res) => {
+	console.log("GETTING APPLICATION");
+
+	// Validating that an ID was provided
+	if (req.query.id === null || req.query.id === undefined) {
+		res.status(400).json({ Error: "id param required" });
+	}
+
+	// TODO: NEED TO ENSURE APPLICATION IS FOR THE LOGGED IN USER WHEN AUTH EXISTS
+	db.getSingleApplication(req.query.id)
+		.then((application) => {
+			if (application.error === null) {
+				console.log("GOT APPLICATION");
+
+				application.success = true;
+
+				res.json(application);
+			} else {
+				res.status(500).json({ success: false, error: application.error });
+			}
+		})
+		.catch((err) => {
+			res.status(500).json({ success: false, error: err });
+		});
+});
+
+/**
  * Get applications for user route
  */
 

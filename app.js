@@ -14,6 +14,7 @@ app.use(cors());
 
 // Setting routes
 app.use("/api", require("./routes/api"));
+app.use("/auth", require("./routes/auth"));
 
 // Getting port from env or setting to 5000
 const PORT = process.env.PORT || 5000;

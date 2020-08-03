@@ -109,13 +109,15 @@ router.put("/application", (req, res) => {
 		applicationlink
 	)
 		.then((confirm) => {
-			confirm.success = true;
-			// If update successful, returning the updated DB row as an object
-			res.json(confirm);
+			if (confirm.error === null || confirm.error === undefined) {
+				res.json(confirm);
+			} else {
+				res.status(500).json({ error: confirm.error });
+			}
 		})
 		.catch((err) => {
 			// If update failed, responding with error
-			res.status(500).json({ success: false, error: err });
+			res.status(500).json({ error: err });
 		});
 });
 

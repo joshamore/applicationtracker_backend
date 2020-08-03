@@ -243,7 +243,7 @@ module.exports = {
 	getPasswordHash: async function (email) {
 		// Setting query
 		const query = {
-			text: "SELECT password_hash FROM users WHERE email=$1",
+			text: "SELECT password_hash, user_id FROM users WHERE email=$1",
 			values: [email],
 		};
 
@@ -254,7 +254,7 @@ module.exports = {
 			if (confirm.rows.length === 0) {
 				return { unknown: true };
 			} else {
-				return confirm.rows[0].password_hash;
+				return confirm.rows[0];
 			}
 		} catch (err) {
 			console.error(`deleteApplication error: ${err}`);

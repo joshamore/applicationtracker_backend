@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../helpers/db");
 const CONSTANTS = require("../CONSTANTS");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 /**
  * Register Route
@@ -91,25 +92,34 @@ router.post("/login", async (req, res) => {
 	}
 
 	try {
-		// Getting password has
-		let passwordHash = await db.getPasswordHash(email);
+		// Getting password hash
+		let getPasswordHash = await db.getPasswordHash(email);
 
 		// Responding if email address unknown
-		if (passwordHash.unknown === true) {
+		if (getPasswordHash.unknown === true) {
 			res.status(400).json({ error: "email address does not exist" });
 		}
+
+		// Storing password hash and user ID
+		let passwordHash = getPasswordHash.password_hash;
+		let userID = getPasswordHash.user_id;
 
 		// Checking hash
 		const validPassword = await bcrypt.compare(password, passwordHash);
 
+		// Responding with error is password incorrect
 		if (!validPassword) {
 			res.status(400).json({ error: "password incorrect" });
 		}
 
-		// TODO: JWT stuff from here
-		res.send("GOOD! But no auth stuff yet");
+		// Creating JSONWEBTOKEN
+		const token = jwt.sign({ id: userID }, CONSTANTS.auth.JWT_SECRET);
+
+		// Returning token
+		res.header("auth-token", token).send(token);
 	} catch (err) {
-		res.status(500).json({ error: err });
+		console.error(`login error: ${err.message}`);
+		res.status(500).json({ error: err.message });
 	}
 });
 

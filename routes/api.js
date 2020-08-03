@@ -2,12 +2,21 @@ const express = require("express");
 const router = express.Router();
 const db = require("../helpers/db");
 const CONSTANTS = require("../CONSTANTS");
+const verify = require("../helpers/verifyToken");
 
 /**
  * Ping route to check connecton with backend
  */
 
 router.get("/ping", (req, res) => {
+	res.json({ success: "Pong" });
+});
+
+/**
+ * Privte Ping route to check connecton with backend
+ */
+
+router.get("/pping", verify, (req, res) => {
 	res.json({ success: "Pong" });
 });
 

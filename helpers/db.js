@@ -48,6 +48,7 @@ module.exports = {
 			return { error: err };
 		}
 	},
+
 	/**
 	 * Update an existing application record
 	 */
@@ -164,6 +165,71 @@ module.exports = {
 			}
 		} catch (err) {
 			console.error(`deleteApplication error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
+
+	/**
+	 * Checking if an email address already exists in DB
+	 */
+	emailExists: async function (email) {
+		// Setting query
+		const query = {
+			text: "SELECT * FROM users WHERE email=$1",
+			values: [email],
+		};
+
+		try {
+			// Attempting DB update
+			const confirm = await pool.query(query);
+
+			if (confirm.rows.length === 0) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (err) {
+			console.error(`deleteApplication error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
+
+	/**
+	 * Create user record in DB
+	 */
+	createUser: async function (email, password, firstName, lastName) {
+		// TODO: Need to hash password
+		let paswordHash = "HASH";
+
+		// Setting query
+		const query = {
+			text: `
+				INSERT INTO users (first_name, last_name, email, password_hash)
+				VALUES ($1, $2, $3, $4)
+				RETURNING user_id
+			`,
+			values: [firstName, lastName, email, paswordHash],
+		};
+
+		try {
+			// Attempting DB update
+			const confirm = await pool.query(query);
+
+			// Checking if insertion successful
+			if (confirm.rows === null || confirm.rows === undefined) {
+				throw Error("Unknown error when creating user");
+			} else if (
+				confirm.rows[0].user_id === undefined ||
+				confirm.rows[0].user_id === null
+			) {
+				throw Error("Unknown error when creating user");
+			} else {
+				return confirm.rows[0].user_id;
+			}
+		} catch (err) {
+			console.error(`createUser error: ${err}`);
 			// returning error
 			return { error: err };
 		}

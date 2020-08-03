@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../helpers/db");
 const CONSTANTS = require("../CONSTANTS");
+const bcrypt = require("bcryptjs");
 
 /**
  * Register Route
@@ -70,8 +71,46 @@ router.post("/register", async (req, res) => {
  * Login Route
  */
 
-router.post("/login", (req, res) => {
-	//TODO
+router.post("/login", async (req, res) => {
+	const email = req.body.email;
+	const password = req.body.password;
+
+	let valErrors = [];
+
+	// Validating provided fields
+	if (email === null || email === undefined) {
+		valErrors.push("email field required. This cannot be null");
+	}
+	if (password === null || password === undefined) {
+		valErrors.push("password field required. This cannot be null");
+	}
+
+	// Returning with 400 response if errors present
+	if (valErrors.length > 0) {
+		res.status(400).json({ error: valErrors });
+	}
+
+	try {
+		// Getting password has
+		let passwordHash = await db.getPasswordHash(email);
+
+		// Responding if email address unknown
+		if (passwordHash.unknown === true) {
+			res.status(400).json({ error: "email address does not exist" });
+		}
+
+		// Checking hash
+		const validPassword = await bcrypt.compare(password, passwordHash);
+
+		if (!validPassword) {
+			res.status(400).json({ error: "password incorrect" });
+		}
+
+		// TODO: JWT stuff from here
+		res.send("GOOD! But no auth stuff yet");
+	} catch (err) {
+		res.status(500).json({ error: err });
+	}
 });
 
 module.exports = router;

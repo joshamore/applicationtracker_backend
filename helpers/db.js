@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const CONSTANTS = require("../CONSTANTS");
+const bcrypt = require("bcryptjs");
 
 // Setting DB connection string for node-postgres library
 const connectionString = CONSTANTS.database.connection_string;
@@ -190,7 +191,7 @@ module.exports = {
 				return true;
 			}
 		} catch (err) {
-			console.error(`deleteApplication error: ${err}`);
+			console.error(`emailExists error: ${err}`);
 			// returning error
 			return { error: err };
 		}
@@ -200,8 +201,9 @@ module.exports = {
 	 * Create user record in DB
 	 */
 	createUser: async function (email, password, firstName, lastName) {
-		// TODO: Need to hash password
-		let paswordHash = "HASH";
+		// Hashing password
+		const salt = await bcrypt.genSalt(10);
+		const paswordHash = await bcrypt.hash(password, salt);
 
 		// Setting query
 		const query = {
@@ -230,6 +232,32 @@ module.exports = {
 			}
 		} catch (err) {
 			console.error(`createUser error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
+
+	/**
+	 * Get password hash for user
+	 */
+	getPasswordHash: async function (email) {
+		// Setting query
+		const query = {
+			text: "SELECT password_hash FROM users WHERE email=$1",
+			values: [email],
+		};
+
+		try {
+			// Attempting DB update
+			const confirm = await pool.query(query);
+
+			if (confirm.rows.length === 0) {
+				return { unknown: true };
+			} else {
+				return confirm.rows[0].password_hash;
+			}
+		} catch (err) {
+			console.error(`deleteApplication error: ${err}`);
 			// returning error
 			return { error: err };
 		}

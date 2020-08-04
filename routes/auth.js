@@ -4,6 +4,7 @@ const db = require("../helpers/db");
 const CONSTANTS = require("../CONSTANTS");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const verify = require("../helpers/verifyToken");
 
 /**
  * Register Route
@@ -25,10 +26,10 @@ router.post("/register", async (req, res) => {
 		valErrors.push("password field required. This cannot be null");
 	}
 	if (firstName === null || firstName === undefined) {
-		valErrors.push("firstName field required. This cannot be null");
+		valErrors.push("firstname field required. This cannot be null");
 	}
 	if (lastName === null || lastName === undefined) {
-		valErrors.push("lastName field required. This cannot be null");
+		valErrors.push("lastname field required. This cannot be null");
 	}
 	if (password.length <= 8) {
 		valErrors.push("Password must contain at least 9 characters");
@@ -118,11 +119,18 @@ router.post("/login", async (req, res) => {
 		});
 
 		// Returning token
-		res.header("auth-token", token).send(token);
+		res.header("auth-token", token).json({ token: token });
 	} catch (err) {
 		console.error(`login error: ${err.message}`);
 		res.status(500).json({ error: err.message });
 	}
+});
+
+/**
+ * Check token validity route
+ */
+router.get("/check", verify, (req, res) => {
+	res.json({ auth: true });
 });
 
 module.exports = router;

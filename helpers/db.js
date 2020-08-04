@@ -16,7 +16,7 @@ module.exports = {
 	 *
 	 * Returns: ID of new applications record.
 	 */
-	createApplication: async function (apptitle, appemployer, applink) {
+	createApplication: async function (userID, apptitle, appemployer, applink) {
 		// Setting DB query
 		// TODO: Need to use a real auth user in prod
 		const query = {
@@ -25,12 +25,7 @@ module.exports = {
                 VALUES ($1, $2, $3, $4)
                 RETURNING app_id
                 `,
-			values: [
-				CONSTANTS.testing.auth_user_uuid,
-				apptitle,
-				appemployer,
-				applink,
-			],
+			values: [userID, apptitle, appemployer, applink],
 		};
 
 		// Creating new record in the applications table
@@ -53,10 +48,16 @@ module.exports = {
 	/**
 	 * Update an existing application record
 	 */
-	updateApplication: async function (appID, appTitle, appEmployer, appLink) {
+	updateApplication: async function (
+		userID,
+		appID,
+		appTitle,
+		appEmployer,
+		appLink
+	) {
 		try {
 			// Getting application original state
-			const appOriginal = await this.getSingleApplication(appID);
+			const appOriginal = await this.getSingleApplication(appID, userID);
 
 			// Updating params to original values if null
 			appTitle = appTitle === null ? appOriginal.app_title : appTitle;
@@ -74,11 +75,11 @@ module.exports = {
 						app_employer = $2,
 						app_link = $3
 					WHERE
-						app_id = $4
+						app_id = $4 AND app_user = $5
 					RETURNING
 						*
 					`,
-				values: [appTitle, appEmployer, appLink, appID],
+				values: [appTitle, appEmployer, appLink, appID, userID],
 			};
 
 			const record = await pool.query(query);
@@ -92,13 +93,14 @@ module.exports = {
 	},
 
 	/**
-	 * Get applications for a user
+	 * Get active applications for a user
 	 */
 	getApplications: async function (user) {
 		// Setting query
 		const query = {
-			text: "SELECT * FROM applications WHERE app_user = $1",
-			values: [user],
+			text:
+				"SELECT * FROM applications WHERE app_user = $1 AND app_recordstate = $2",
+			values: [user, CONSTANTS.recordstates.active],
 		};
 
 		try {
@@ -119,11 +121,11 @@ module.exports = {
 	/**
 	 * Get a single application based on application ID
 	 */
-	getSingleApplication: async function (appID) {
+	getSingleApplication: async function (appID, userID) {
 		// Setting query
 		const query = {
-			text: "SELECT * FROM applications WHERE app_id = $1",
-			values: [appID],
+			text: "SELECT * FROM applications WHERE app_id = $1 AND app_user = $2",
+			values: [appID, userID],
 		};
 
 		try {
@@ -144,12 +146,12 @@ module.exports = {
 	/**
 	 * Delete an application for a user
 	 */
-	deleteApplication: async function (application) {
+	deleteApplication: async function (userID, application) {
 		// Setting query
 		const query = {
 			text:
-				"UPDATE applications SET app_recordstate = $1 WHERE app_id = $2 RETURNING app_id",
-			values: [CONSTANTS.recordstates.deleted, application],
+				"UPDATE applications SET app_recordstate = $1 WHERE app_id = $2 AND app_user = $3 RETURNING app_id",
+			values: [CONSTANTS.recordstates.deleted, application, userID],
 		};
 
 		try {

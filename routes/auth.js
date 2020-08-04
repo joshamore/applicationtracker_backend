@@ -113,7 +113,9 @@ router.post("/login", async (req, res) => {
 		}
 
 		// Creating JSONWEBTOKEN
-		const token = jwt.sign({ id: userID }, CONSTANTS.auth.JWT_SECRET);
+		const token = jwt.sign({ id: userID }, CONSTANTS.auth.JWT_SECRET, {
+			expiresIn: "24h",
+		});
 
 		// Returning token
 		res.header("auth-token", token).send(token);

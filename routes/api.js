@@ -24,7 +24,10 @@ router.get("/pping", verify, (req, res) => {
  * Create application route
  */
 
-router.post("/application", (req, res) => {
+router.post("/application", verify, (req, res) => {
+	// Current user ID
+	const userID = req.user.id;
+
 	// Store for validation errors
 	let validationErrors = [];
 
@@ -56,7 +59,12 @@ router.post("/application", (req, res) => {
 	}
 
 	// Attempting to create record in DB
-	db.createApplication(applicationtitle, applicationemployer, applicationlink)
+	db.createApplication(
+		userID,
+		applicationtitle,
+		applicationemployer,
+		applicationlink
+	)
 		.then((confirm) => {
 			// Returning success if no error
 			if (confirm.error === null) {
@@ -74,7 +82,10 @@ router.post("/application", (req, res) => {
  * Update an existing application
  */
 
-router.put("/application", (req, res) => {
+router.put("/application", verify, (req, res) => {
+	// Current user
+	const userID = req.user.id;
+
 	let validationErrors = [];
 
 	// Extracint required values from body object
@@ -112,6 +123,7 @@ router.put("/application", (req, res) => {
 
 	// Performing update
 	db.updateApplication(
+		userID,
 		id,
 		applicationtitle,
 		applicationemployer,
@@ -134,28 +146,58 @@ router.put("/application", (req, res) => {
  * Get a single application for user route
  */
 
-router.get("/application", (req, res) => {
-	console.log("GETTING APPLICATION");
-
+router.get("/application", verify, (req, res) => {
 	// Validating that an ID was provided
 	if (req.query.id === null || req.query.id === undefined) {
 		res.status(400).json({ Error: "id param required" });
 	}
 
-	// TODO: NEED TO ENSURE APPLICATION IS FOR THE LOGGED IN USER WHEN AUTH EXISTS
-	db.getSingleApplication(req.query.id)
+	// Current user
+	const userID = req.user.id;
+
+	// Backend log
+	console.log(`GETTING APPLICATION FOR USER: ${userID}`);
+
+	// Attempting to get applicaton for the user
+	db.getSingleApplication(req.query.id, userID)
 		.then((application) => {
 			if (application.error === null) {
-				console.log("GOT APPLICATION");
+				// If no record found, returning 400
+				if (application.length === 0) {
+					console.log(
+						`APPLICATION ${req.query.id} DOES NOT EXIST FOR ${userID}`
+					);
+					res.status(400).json({
+						success: false,
+						error: `Application ${req.query.id} does not exist for this user`,
+					});
+				}
 
+				// Backend log
+				console.log(`GOT APPLICATION FOR USER: ${userID}`);
+
+				// Setting success to true
 				application.success = true;
 
+				// Responding with application record
 				res.json(application);
 			} else {
+				// Backend log
+				console.log(
+					`FAILED TO GET APPLICATION ${req.query.id} FOR USER ${userID}. ERROR: ${application.error}`
+				);
+
+				// Responding with 500 and error
 				res.status(500).json({ success: false, error: application.error });
 			}
 		})
 		.catch((err) => {
+			// Backend log
+			console.log(
+				`FAILED TO GET APPLICATION ${req.query.id} FOR USER ${userID}. ERROR: ${err}`
+			);
+
+			// Responding with error
 			res.status(500).json({ success: false, error: err });
 		});
 });
@@ -164,21 +206,35 @@ router.get("/application", (req, res) => {
  * Get applications for user route
  */
 
-router.get("/application/all", (req, res) => {
-	console.log("GETTING APPLICATIONS");
+router.get("/application/all", verify, (req, res) => {
+	// Current user
+	const userID = req.user.id;
 
-	// TODO: currently using UUID from constants but will come from logged in user
-	db.getApplications(CONSTANTS.testing.auth_user_uuid)
+	// Backend log
+	console.log(`GETTING APPLICATIONS FOR USER: ${user}`);
+
+	// Getting applications for the logged in user
+	db.getApplications(userID)
 		.then((applications) => {
 			if (applications.error === null) {
-				console.log("GOT APPLICATIONS");
+				// Backend log
+				console.log(`GOT APPLICATIONS FOR USER: ${user}`);
 
+				// Returning applications
 				res.json(applications);
 			} else {
+				// Backend log
+				console.log(`UNABLE TO GET APPLICATIONS FOR USER: ${user}`);
+
+				// Responding with 500 if error getting applications
 				res.status(500).json({ success: false, error: applications.error });
 			}
 		})
 		.catch((err) => {
+			// Backend log
+			console.log(`UNABLE TO GET APPLICATIONS FOR USER: ${user}`);
+
+			// Responding with 500 if error getting applications
 			res.status(500).json({ success: false, error: err });
 		});
 });
@@ -187,21 +243,39 @@ router.get("/application/all", (req, res) => {
  * Delete an application
  */
 
-router.delete("/application", (req, res) => {
+router.delete("/application", verify, (req, res) => {
 	// Validating ID has been provided
 	if (req.query.id === null || req.query.id === undefined) {
 		res.status(400).json({ Error: "id param required" });
 	}
 
-	db.deleteApplication(req.query.id)
+	// Current user
+	const userID = req.user.id;
+
+	// Performing delete (this is a status delete not a true delete)
+	db.deleteApplication(userID, req.query.id)
 		.then((confirm) => {
 			if (confirm === req.query.id) {
+				// Backend log
+				console.log(
+					`SET RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${user}`
+				);
+
+				// Respond with success
 				res.json({ success: true, error: null });
 			} else {
+				// Backend log
+				console.log(
+					`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${user}`
+				);
 				res.status(500).json({ success: false, error: confirm.error });
 			}
 		})
 		.catch((err) => {
+			// Backend log
+			console.log(
+				`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${user}`
+			);
 			res.status(500).json({ success: false, error: err });
 		});
 });

@@ -211,20 +211,20 @@ router.get("/application/all", verify, (req, res) => {
 	const userID = req.user.id;
 
 	// Backend log
-	console.log(`GETTING APPLICATIONS FOR USER: ${user}`);
+	console.log(`GETTING APPLICATIONS FOR USER: ${userID}`);
 
 	// Getting applications for the logged in user
 	db.getApplications(userID)
 		.then((applications) => {
 			if (applications.error === null) {
 				// Backend log
-				console.log(`GOT APPLICATIONS FOR USER: ${user}`);
+				console.log(`GOT APPLICATIONS FOR USER: ${userID}`);
 
 				// Returning applications
 				res.json(applications);
 			} else {
 				// Backend log
-				console.log(`UNABLE TO GET APPLICATIONS FOR USER: ${user}`);
+				console.log(`UNABLE TO GET APPLICATIONS FOR USER: ${userID}`);
 
 				// Responding with 500 if error getting applications
 				res.status(500).json({ success: false, error: applications.error });
@@ -232,7 +232,7 @@ router.get("/application/all", verify, (req, res) => {
 		})
 		.catch((err) => {
 			// Backend log
-			console.log(`UNABLE TO GET APPLICATIONS FOR USER: ${user}`);
+			console.log(`UNABLE TO GET APPLICATIONS FOR USER: ${userID}`);
 
 			// Responding with 500 if error getting applications
 			res.status(500).json({ success: false, error: err });

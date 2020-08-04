@@ -4,6 +4,7 @@ const CONSTANTS = require(".././CONSTANTS");
 /**
  * Verifies a JWT token
  */
+
 module.exports = function (req, res, next) {
 	// Getting token from req
 	const token = req.header("auth-token");

@@ -11,7 +11,7 @@ module.exports = function (req, res, next) {
 
 	// Responding with 401 if no token present
 	if (token === null || token === undefined) {
-		throw Error("not logged in");
+		res.status(400).json({ error: "not logged in" });
 	}
 
 	try {

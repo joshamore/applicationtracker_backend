@@ -254,7 +254,7 @@ module.exports = {
 			const confirm = await pool.query(query);
 
 			if (confirm.rows.length === 0) {
-				return { unknown: true };
+				return "failed";
 			} else {
 				return confirm.rows[0];
 			}

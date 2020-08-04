@@ -97,7 +97,7 @@ router.post("/login", async (req, res) => {
 		let getPasswordHash = await db.getPasswordHash(email);
 
 		// Responding if email address unknown
-		if (getPasswordHash.unknown === true) {
+		if (getPasswordHash === "failed") {
 			res.status(400).json({ error: "email address does not exist" });
 		}
 

@@ -119,7 +119,7 @@ router.post("/login", async (req, res) => {
 		});
 
 		// Returning token
-		res.header("auth-token", token).json({ token: token });
+		res.json({ token: token });
 	} catch (err) {
 		console.error(`login error: ${err.message}`);
 		res.status(500).json({ error: err.message });

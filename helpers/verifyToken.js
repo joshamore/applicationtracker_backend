@@ -11,17 +11,17 @@ module.exports = function (req, res, next) {
 
 	// Responding with 401 if no token present
 	if (token === null || token === undefined) {
-		res.status(401).json({ error: "please log in" });
+		throw Error("not logged in");
 	}
 
 	try {
 		// If verification possible, adding to req and calling next middleware
 		const verified = jwt.verify(token, CONSTANTS.auth.JWT_SECRET);
 		req.user = verified;
-
-		next();
 	} catch (err) {
 		// If token can't be verified, responding with error
 		res.status(400).json({ error: `Auth error: ${err}` });
 	}
+
+	next();
 };

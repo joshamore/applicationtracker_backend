@@ -18,10 +18,10 @@ module.exports = function (req, res, next) {
 		// If verification possible, adding to req and calling next middleware
 		const verified = jwt.verify(token, CONSTANTS.auth.JWT_SECRET);
 		req.user = verified;
+
+		next();
 	} catch (err) {
 		// If token can't be verified, responding with error
 		res.status(400).json({ error: `Auth error: ${err}` });
 	}
-
-	next();
 };

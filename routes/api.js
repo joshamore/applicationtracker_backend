@@ -280,4 +280,60 @@ router.delete("/application", verify, (req, res) => {
 		});
 });
 
+/**
+ * Get application items for a user route
+ */
+
+router.get("/application/item/all", verify, (req, res) => {
+	// Current user
+	const userID = req.user.id;
+
+	// Storing application ID
+	const applicationID = req.query.id;
+
+	// Validating that an ID was provided
+	if (req.query.id === null || req.query.id === undefined) {
+		res.status(400).json({
+			Error:
+				"id param required and must contain id of an application for the current user",
+		});
+
+		return;
+	}
+
+	// Backend log
+	console.log(`GETTING APPLICATION ITEMS FOR USER: ${userID}`);
+
+	db.getApplicationitems(userID, applicationID)
+		.then((confirm) => {
+			if (!confirm) {
+				// Backend log
+				console.log(
+					`NO APPLICATION ITEMS FOR USER: ${userID} APPLICATION: ${applicationID}`
+				);
+
+				res.json([]);
+				return;
+			} else {
+				// Backend log
+				console.log(
+					`GOT APPLICATION ITEMS FOR USER: ${userID} APPLICATION: ${applicationID}`
+				);
+
+				res.json(confirm);
+				return;
+			}
+		})
+		.catch((err) => {
+			// Backend log
+			console.log(
+				`ERROR GETTING APPLICATION ITEMS FOR USER: ${userID}` +
+					`APPLICATION: ${applicationID} ERROR: ${err}`
+			);
+
+			res.status(500).json({ success: false, error: err });
+			return;
+		});
+});
+
 module.exports = router;

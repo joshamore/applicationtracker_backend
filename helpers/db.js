@@ -264,4 +264,32 @@ module.exports = {
 			return { error: err };
 		}
 	},
+
+	/**
+	 * Get application items for user
+	 */
+	getApplicationitems: async function (userID, applicationID) {
+		// Setting query
+		const query = {
+			text:
+				"SELECT * FROM application_items WHERE item_user=$1 AND item_application=$2",
+			values: [userID, applicationID],
+		};
+
+		try {
+			// Attempting to get data from DB
+			const confirm = await pool.query(query);
+
+			// Returning data if exists. Otherwise, false if no data
+			if (confirm.rows.length === 0) {
+				return false;
+			} else {
+				return confirm.rows;
+			}
+		} catch (err) {
+			console.error(`getApplicationitems error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
 };

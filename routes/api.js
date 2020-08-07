@@ -336,4 +336,52 @@ router.get("/application/item/all", verify, (req, res) => {
 		});
 });
 
+/**
+ * Create application item for an application route
+ */
+
+router.post("/application/item", verify, (req, res) => {
+	// Current user
+	const userID = req.user.id;
+
+	// Storing application ID
+	const applicationID = req.body.applicationID;
+	const itemContent = req.body.itemContent;
+	const itemTimestamp = null;
+
+	// Backend log
+	console.log(`CREATING APPLICATION ITEM FOR USER: ${userID}`);
+
+	db.createApplicationItem(userID, applicationID, itemContent, itemTimestamp)
+		.then((confirm) => {
+			if (confirm.item_id === null || confirm.item_id === undefined) {
+				// Backend log
+				console.log(
+					`NO APPLICATION ITEMS FOR USER: ${userID} APPLICATION: ${applicationID}`
+				);
+
+				res.json(null);
+				return;
+			} else {
+				// Backend log
+				console.log(
+					`GOT APPLICATION ITEMS FOR USER: ${userID} APPLICATION: ${applicationID}`
+				);
+
+				res.json(confirm);
+				return;
+			}
+		})
+		.catch((err) => {
+			// Backend log
+			console.log(
+				`ERROR GETTING APPLICATION ITEMS FOR USER: ${userID}` +
+					`APPLICATION: ${applicationID} ERROR: ${err}`
+			);
+
+			res.status(500).json({ success: false, error: err });
+			return;
+		});
+});
+
 module.exports = router;

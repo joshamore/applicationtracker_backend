@@ -292,4 +292,41 @@ module.exports = {
 			return { error: err };
 		}
 	},
+
+	/**
+	 * Create an application itemrecord.
+	 *
+	 */
+	createApplicationItem: async function (
+		userID,
+		applicationID,
+		itemContent,
+		itemTimestamp
+	) {
+		// Setting DB query
+
+		const query = {
+			text: `
+                INSERT INTO application_items (item_user, item_application, item_content, item_timestamp)
+                VALUES ($1, $2, $3, $4)
+                RETURNING item_id
+                `,
+			values: [userID, applicationID, itemContent, itemTimestamp],
+		};
+
+		// Creating new record in the application_items table
+		try {
+			const confirm = await pool.query(query);
+
+			// Setting error to null
+			let confirmResponse = confirm.rows[0];
+
+			// Returning first row (contains an object with app_id as key)
+			return confirmResponse;
+		} catch (err) {
+			console.error(`createApplicationItem error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
 };

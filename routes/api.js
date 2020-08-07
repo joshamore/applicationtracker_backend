@@ -384,4 +384,6 @@ router.post("/application/item", verify, (req, res) => {
 		});
 });
 
+// TODO: update and delete route for applicaion items
+
 module.exports = router;

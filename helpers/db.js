@@ -268,7 +268,7 @@ module.exports = {
 	/**
 	 * Get application items for user
 	 */
-	getApplicationitems: async function (userID, applicationID) {
+	getApplicationItems: async function (userID, applicationID) {
 		// Setting query
 		const query = {
 			text:

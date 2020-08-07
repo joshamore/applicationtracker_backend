@@ -304,7 +304,7 @@ router.get("/application/item/all", verify, (req, res) => {
 	// Backend log
 	console.log(`GETTING APPLICATION ITEMS FOR USER: ${userID}`);
 
-	db.getApplicationitems(userID, applicationID)
+	db.getApplicationItems(userID, applicationID)
 		.then((confirm) => {
 			if (!confirm) {
 				// Backend log

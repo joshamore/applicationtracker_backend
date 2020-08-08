@@ -304,6 +304,7 @@ module.exports = {
 	createApplicationItem: async function (
 		userID,
 		applicationID,
+		itemTitle,
 		itemContent,
 		itemTimestamp
 	) {
@@ -311,11 +312,12 @@ module.exports = {
 
 		const query = {
 			text: `
-                INSERT INTO application_items (item_user, item_application, item_content, item_timestamp)
-                VALUES ($1, $2, $3, $4)
+				INSERT INTO application_items 
+					(item_user, item_application, itemTitle, item_content, item_timestamp)
+                VALUES ($1, $2, $3, $4, $5)
                 RETURNING item_id
                 `,
-			values: [userID, applicationID, itemContent, itemTimestamp],
+			values: [userID, applicationID, itemTitle, itemContent, itemTimestamp],
 		};
 
 		// Creating new record in the application_items table

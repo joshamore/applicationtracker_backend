@@ -346,13 +346,20 @@ router.post("/application/item", verify, (req, res) => {
 
 	// Storing application ID
 	const applicationID = req.body.applicationID;
+	const itemTitle = req.body.itemTitle;
 	const itemContent = req.body.itemContent;
 	const itemTimestamp = null;
 
 	// Backend log
 	console.log(`CREATING APPLICATION ITEM FOR USER: ${userID}`);
 
-	db.createApplicationItem(userID, applicationID, itemContent, itemTimestamp)
+	db.createApplicationItem(
+		userID,
+		itemTitle,
+		applicationID,
+		itemContent,
+		itemTimestamp
+	)
 		.then((confirm) => {
 			if (confirm.item_id === null || confirm.item_id === undefined) {
 				// Backend log

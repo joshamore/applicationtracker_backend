@@ -275,7 +275,7 @@ module.exports = {
 				SELECT * FROM application_items
 				WHERE item_user=$1 AND item_application=$2
 				AND item_recordstate=$3
-				ORDER BY item_created_timestamp DESC
+				ORDER BY item_timestamp DESC
 				`,
 			values: [userID, applicationID, CONSTANTS.recordstates.active],
 		};

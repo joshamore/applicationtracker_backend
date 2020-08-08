@@ -271,8 +271,11 @@ module.exports = {
 	getApplicationItems: async function (userID, applicationID) {
 		// Setting query
 		const query = {
-			text:
-				"SELECT * FROM application_items WHERE item_user=$1 AND item_application=$2",
+			text: `
+				SELECT * FROM application_items
+				WHERE item_user=$1 AND item_application=$2
+				ORDER BY item_created_timestamp
+				`,
 			values: [userID, applicationID],
 		};
 

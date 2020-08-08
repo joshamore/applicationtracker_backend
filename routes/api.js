@@ -348,7 +348,7 @@ router.post("/application/item", verify, (req, res) => {
 	const applicationID = req.body.applicationID;
 	const itemTitle = req.body.itemTitle;
 	const itemContent = req.body.itemContent;
-	const itemTimestamp = null;
+	const itemTimestamp = req.body.itemTimestamp;
 
 	// Backend log
 	console.log(`CREATING APPLICATION ITEM FOR USER: ${userID}`);

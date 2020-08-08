@@ -355,8 +355,8 @@ router.post("/application/item", verify, (req, res) => {
 
 	db.createApplicationItem(
 		userID,
-		itemTitle,
 		applicationID,
+		itemTitle,
 		itemContent,
 		itemTimestamp
 	)

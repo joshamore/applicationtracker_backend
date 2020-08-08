@@ -313,11 +313,11 @@ module.exports = {
 		const query = {
 			text: `
 				INSERT INTO application_items 
-					(item_user, item_application, itemTitle, item_content, item_timestamp)
+					(item_user, item_application, item_content, item_timestamp, item_title)
                 VALUES ($1, $2, $3, $4, $5)
                 RETURNING item_id
                 `,
-			values: [userID, applicationID, itemTitle, itemContent, itemTimestamp],
+			values: [userID, applicationID, itemContent, itemTimestamp, itemTitle],
 		};
 
 		// Creating new record in the application_items table

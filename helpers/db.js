@@ -298,8 +298,37 @@ module.exports = {
 	},
 
 	/**
+	 * Get a single application item for user
+	 */
+	getSingleApplicationItem: async function (userID, applicationID, itemID) {
+		// Setting query
+		const query = {
+			text: `
+				SELECT * FROM application_items
+				WHERE item_user=$1 AND item_application=$2 AND item_id=$3
+				`,
+			values: [userID, applicationID, itemID],
+		};
+
+		try {
+			// Attempting to get data from DB
+			const confirm = await pool.query(query);
+
+			// Returning data if exists. Otherwise, error if no data
+			if (confirm.rows.length === 0) {
+				return { error: "No such record" };
+			} else {
+				return confirm.rows[0];
+			}
+		} catch (err) {
+			console.error(`getSingleApplicationitem error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
+
+	/**
 	 * Create an application itemrecord.
-	 *
 	 */
 	createApplicationItem: async function (
 		userID,
@@ -332,6 +361,67 @@ module.exports = {
 		} catch (err) {
 			console.error(`createApplicationItem error: ${err}`);
 			// returning error
+			return { error: err };
+		}
+	},
+
+	/**
+	 * Update an existing application item record
+	 */
+	updateApplicationItem: async function (
+		userID,
+		appID,
+		itemID,
+		itemTitle,
+		itemContent,
+		itemTimestamp
+	) {
+		try {
+			// Getting application item original state
+			const appItemOriginal = await this.getSingleApplicationItem(
+				appID,
+				userID,
+				itemID
+			);
+
+			// If error, throwing error
+			if (appItemOriginal.error !== undefined && appItemOriginal.error) {
+				throw Error(appItemOriginal.error);
+			}
+
+			// Updating params to original values if null
+			itemTitle = itemTitle === null ? appItemOriginal.item_title : itemTitle;
+			itemContent =
+				itemContent === null ? appItemOriginal.item_content : itemContent;
+			itemTimestamp =
+				itemTimestamp === null ? appItemOriginal.item_timestamp : itemTimestamp;
+
+			// Building query
+			const query = {
+				text: `
+					UPDATE
+						application_items
+					SET
+						item_title = $1,
+						item_content = $2,
+						item_timestamp = $3
+					WHERE
+						item_application = $4 AND item_user = $5 AND item_id = $6
+					RETURNING
+						*
+					`,
+				values: [itemTitle, itemContent, itemTimestamp, appID, userID, itemID],
+			};
+
+			// Updating record
+			const record = await pool.query(query);
+
+			// Returning updated record
+			return record.rows[0];
+		} catch (err) {
+			console.error(
+				`ERROR UPDATING APPLICATION ITEM ${itemID} -- ERROR: ${err}`
+			);
 			return { error: err };
 		}
 	},

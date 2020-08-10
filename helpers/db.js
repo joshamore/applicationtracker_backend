@@ -300,14 +300,11 @@ module.exports = {
 	/**
 	 * Get a single application item for user
 	 */
-	getSingleApplicationItem: async function (userID, applicationID, itemID) {
+	getSingleApplicationItem: async function (itemID) {
 		// Setting query
 		const query = {
-			text: `
-				SELECT * FROM application_items
-				WHERE item_user=$1 AND item_application=$2 AND item_id=$3
-				`,
-			values: [userID, applicationID, itemID],
+			text: `SELECT * FROM application_items WHERE item_id = $1`,
+			values: [itemID],
 		};
 
 		try {
@@ -378,11 +375,7 @@ module.exports = {
 	) {
 		try {
 			// Getting application item original state
-			const appItemOriginal = await this.getSingleApplicationItem(
-				appID,
-				userID,
-				itemID
-			);
+			const appItemOriginal = await this.getSingleApplicationItem(itemID);
 
 			// If error, throwing error
 			if (appItemOriginal.error !== undefined && appItemOriginal.error) {

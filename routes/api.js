@@ -391,6 +391,63 @@ router.post("/application/item", verify, (req, res) => {
 		});
 });
 
-// TODO: update and delete route for applicaion items
+/**
+ * Update application item for an application route
+ */
+
+router.put("/application/item", verify, (req, res) => {
+	// Current user
+	const userID = req.user.id;
+
+	// Storing application ID
+	const itemID = req.body.itemID;
+	const applicationID = req.body.applicationID;
+	const itemTitle = req.body.itemTitle;
+	const itemContent = req.body.itemContent;
+	const itemTimestamp = req.body.itemTimestamp;
+
+	// Backend log
+	console.log(`UPDATING APPLICATION ITEM ${itemID} FOR USER: ${userID}`);
+
+	// Updating item
+	db.updateApplicationItem(
+		userID,
+		applicationID,
+		itemID,
+		itemTitle,
+		itemContent,
+		itemTimestamp
+	)
+		.then((confirm) => {
+			if (confirm.item_id === null || confirm.item_id === undefined) {
+				// Backend log
+				console.log(
+					`UNABLE TO UPDATE APPLICATION ITEM ${itemID} FOR USER: ${userID} APPLICATION: ${applicationID}`
+				);
+
+				res.json(null);
+				return;
+			} else {
+				// Backend log
+				console.log(
+					`UPDATED APPLICATION ITEM ${itemID} FOR USER: ${userID} APPLICATION: ${applicationID}`
+				);
+
+				// Returning new item record
+				res.json(confirm);
+				return;
+			}
+		})
+		.catch((err) => {
+			// Backend log
+			console.log(
+				`ERROR UPDATING APPLICATION ITEM ${itemID} FOR USER: ${userID}` +
+					`APPLICATION: ${applicationID} ERROR: ${err}`
+			);
+
+			res.status(500).json({ success: false, error: err });
+			return;
+		});
+});
 
 module.exports = router;

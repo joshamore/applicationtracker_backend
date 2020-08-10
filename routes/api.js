@@ -258,7 +258,7 @@ router.delete("/application", verify, (req, res) => {
 			if (confirm === req.query.id) {
 				// Backend log
 				console.log(
-					`SET RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${user}`
+					`SET RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${userID}`
 				);
 
 				// Respond with success
@@ -266,7 +266,7 @@ router.delete("/application", verify, (req, res) => {
 			} else {
 				// Backend log
 				console.log(
-					`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${user}`
+					`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${userID}`
 				);
 				res.status(500).json({ success: false, error: confirm.error });
 			}
@@ -274,7 +274,7 @@ router.delete("/application", verify, (req, res) => {
 		.catch((err) => {
 			// Backend log
 			console.log(
-				`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${user}`
+				`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP: ${req.query.id} USER: ${userID}`
 			);
 			res.status(500).json({ success: false, error: err });
 		});

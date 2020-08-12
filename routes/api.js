@@ -451,4 +451,45 @@ router.put("/application/item", verify, (req, res) => {
 		});
 });
 
+/**
+ * Delete an application item
+ */
+
+router.delete("/application/item", verify, (req, res) => {
+	// Validating ID has been provided
+	if (req.query.id === null || req.query.id === undefined) {
+		res.status(400).json({ Error: "id param required" });
+	}
+
+	// Current user
+	const userID = req.user.id;
+
+	// Performing delete (this is a status delete not a true delete)
+	db.deleteApplicationItem(userID, req.query.id)
+		.then((confirm) => {
+			if (confirm === req.query.id) {
+				// Backend log
+				console.log(
+					`SET RECORDSTATE TO DELETED FOR APP ITEM: ${req.query.id} USER: ${userID}`
+				);
+
+				// Respond with success
+				res.json({ success: true, error: null });
+			} else {
+				// Backend log
+				console.log(
+					`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP ITEM: ${req.query.id} USER: ${userID}`
+				);
+				res.status(500).json({ success: false, error: confirm.error });
+			}
+		})
+		.catch((err) => {
+			// Backend log
+			console.log(
+				`UNABLE TO UPDATE RECORDSTATE TO DELETED FOR APP ITEM: ${req.query.id} USER: ${userID}`
+			);
+			res.status(500).json({ success: false, error: err });
+		});
+});
+
 module.exports = router;

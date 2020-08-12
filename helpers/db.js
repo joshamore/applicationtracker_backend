@@ -418,4 +418,34 @@ module.exports = {
 			return { error: err };
 		}
 	},
+
+	/**
+	 * Delete an application item for a user
+	 */
+	deleteApplicationItem: async function (userID, applicationItem) {
+		// Setting query
+		const query = {
+			text:
+				"UPDATE application_items SET item_recordstate = $1 WHERE item_id = $2 AND item_user = $3 RETURNING item_id",
+			values: [CONSTANTS.recordstates.deleted, applicationItem, userID],
+		};
+
+		try {
+			// Attempting DB update
+			const confirm = await pool.query(query);
+
+			if (
+				confirm.rows[0].item_id !== null ||
+				confirm.rows[0].item_id !== undefined
+			) {
+				return confirm.rows[0].item_id;
+			} else {
+				throw Error("Unknown confirmation");
+			}
+		} catch (err) {
+			console.error(`deleteApplicationItem error: ${err}`);
+			// returning error
+			return { error: err };
+		}
+	},
 };
